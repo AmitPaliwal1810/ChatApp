@@ -6,7 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { Auth, Chat, Profile } from "./pages";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { useUserInfoStore } from "./store";
 import { apiClient } from "./lib/api-client";
 import { GET_USER_INFO } from "./utlis/constant";
@@ -32,7 +32,7 @@ const GlobalProvider = () => {
     }
   }, [pathname, setUserInfo]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!userInfo) {
       getUserData();
     }
