@@ -11,9 +11,9 @@ interface UserInfo {
 }
 
 export const useUserInfoStore = create<{
-  userInfo: UserInfo | undefined;
-  setUserInfo: (userInfo: UserInfo) => void;
+  userInfo: UserInfo | null | undefined;
+  setUserInfo: (userInfo: UserInfo | null) => void;
 }>((set) => ({
   userInfo: undefined,
-  setUserInfo: (userInfo: UserInfo) => set({ userInfo }),
+  setUserInfo: (userInfo: UserInfo | null) => set({ userInfo }),
 }));

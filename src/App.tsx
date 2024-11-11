@@ -3,40 +3,43 @@ import {
   Navigate,
   Outlet,
   RouteObject,
-  useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { Auth, Chat, Profile } from "./pages";
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUserInfoStore } from "./store";
 import { apiClient } from "./lib/api-client";
 import { GET_USER_INFO } from "./utlis/constant";
 
 const GlobalProvider = () => {
-  const { pathname } = useLocation();
+  const path = window.location.pathname;
+  const navigate = useNavigate();
   const { setUserInfo, userInfo } = useUserInfoStore();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getUserData = useCallback(async () => {
-    const pageRoute = ["/", "/auth"];
-    if (pageRoute.includes(pathname)) return;
     setIsLoading(true);
     try {
       const response = await apiClient.get(GET_USER_INFO, {
         withCredentials: true,
       });
-      setUserInfo(response.data.user);
+      if (response.status === 200) {
+        setUserInfo(response.data.user);
+      }
     } catch (error) {
+      navigate("/auth");
       console.error(error);
     } finally {
       setIsLoading(false);
     }
-  }, [pathname, setUserInfo]);
+  }, [navigate, setUserInfo]);
 
-  useLayoutEffect(() => {
-    if (!userInfo) {
+  useEffect(() => {
+    const pageRoute = ["/", "/auth"];
+    if (!userInfo && !pageRoute.includes(path)) {
       getUserData();
     }
-  }, [getUserData, userInfo]);
+  }, [getUserData, path, userInfo]);
 
   return isLoading ? <>Loading...</> : <Outlet />;
 };
