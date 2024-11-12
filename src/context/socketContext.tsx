@@ -1,8 +1,15 @@
-import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  ReactNode,
+  useState,
+} from "react";
 import { useUserInfoStore } from "../store";
 import { io, Socket } from "socket.io-client";
-import { HOST } from "../utlis/constant";
 import { useChatStore } from "../store/chat-slice";
+import { HOST } from "../utlis/constant";
 
 const SocketContext = createContext<Socket | null>(null);
 
@@ -15,11 +22,12 @@ interface SocketProviderProps {
 }
 
 export const SocketProvider = ({ children }: SocketProviderProps) => {
+  const [isSocketInitialized, setIsSocketInitialized] = useState(false);
   const socket = useRef<Socket | null>(null);
   const { userInfo } = useUserInfoStore();
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && !isSocketInitialized) {
       socket.current = io(HOST, {
         withCredentials: true,
         query: { userId: userInfo.id },
@@ -27,30 +35,39 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
 
       socket.current.on("connect", () => {
         console.log("Connected to socket server");
+        setIsSocketInitialized(true);
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleReceiveMessage = (message: any) => {
+        const { selectedChatData, selectedChatType, addMessages } =
+          useChatStore.getState();
+
+        if (
+          selectedChatType !== undefined &&
+          (selectedChatData?._id === message?.sender?._id ||
+            selectedChatData?._id === message?.recipient?._id)
+        ) {
+          console.log("Message received:", message);
+          addMessages(message);
+        }
+      };
+
+      socket.current.on("receiveMessage", handleReceiveMessage);
+
+      return () => {
+        // socket.current?.off("receiveMessage", handleReceiveMessage);
+        // socket.current?.disconnect();
+      };
     }
+  }, [userInfo, isSocketInitialized]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleReceiveMessage = (message: any) => {
-      const { selectedChatData, selectedChatType, addMessages } =
-        useChatStore.getState();
-
-      if (
-        (selectedChatType !== undefined &&
-          selectedChatData?._id === message?.sender?._id) ||
-        selectedChatData?._id === message?.receipent?._id
-      ) {
-        addMessages(message);
-        console.log("message receive", message);
-      }
-    };
-
-    socket?.current?.on("receiveMessage", handleReceiveMessage);
-
-    return () => {
-      socket.current?.disconnect();
-    };
-  }, [userInfo]);
+  // Log socket to ensure it's defined and connected
+  useEffect(() => {
+    if (socket.current) {
+      console.log("Socket instance initialized:", socket.current);
+    }
+  }, [isSocketInitialized]);
 
   return (
     <SocketContext.Provider value={socket.current}>

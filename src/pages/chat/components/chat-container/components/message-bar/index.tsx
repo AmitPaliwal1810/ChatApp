@@ -20,30 +20,30 @@ interface IEmojiData {
 
 const MessageBar = () => {
   const emojiRef = useRef<HTMLDivElement | null>(null);
-  const Socket = useSocket();
+  const socket = useSocket();
   const { selectedChatType, selectedChatData } = useChatStore();
   const { userInfo } = useUserInfoStore();
   const [message, setMessage] = useState<string>("");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState<boolean>(false);
 
-  const handleSendMessage = useCallback(() => {
-    console.log({type: selectedChatType })
-    if (selectedChatType === "contact") {
-      Socket?.emit("sendMessage", {
+  const handleSendMessage = useCallback(async() => {
+    if (selectedChatType === "contact" && message.trim()) {
+      socket?.emit("sendMessage", {
         sender: userInfo?.id,
         content: message,
         recipient: selectedChatData?._id,
         messageType: "text",
         fileUrl: undefined,
       });
+      setMessage("");
     }
-  }, [Socket, message, selectedChatData?._id, selectedChatType, userInfo?.id]);
+  }, [socket, message, selectedChatData?._id, selectedChatType, userInfo?.id]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         emojiRef.current &&
-        !emojiRef?.current?.contains(event.target as Node)
+        !emojiRef.current.contains(event.target as Node)
       ) {
         setIsEmojiPickerOpen(false);
       }
@@ -53,7 +53,7 @@ const MessageBar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [emojiRef]);
+  }, []);
 
   const handleAddEmoji = useCallback((emoji: IEmojiData) => {
     setMessage((msg) => msg + emoji.emoji);
@@ -64,34 +64,33 @@ const MessageBar = () => {
       <div className="flex-1 flex bg-[#2a2b33] items-center rounded-md gap-5 pr-5">
         <input
           type="text"
-          className="flex-1 flex p-5 bg-transparent foucs:border-none focus:outline-none"
+          className="flex-1 flex p-5 bg-transparent focus:outline-none"
           placeholder="Enter Message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button className="text-neutral-500 focus:border-none focus:outline-none focus:text-white transition-all duration-300">
+        <button className="text-neutral-500">
           <GrAttachment className="text-2xl" />
         </button>
         <div className="relative">
           <button
-            className="text-neutral-500 focus:border-none focus:outline-none focus:text-white transition-all duration-300"
+            className="text-neutral-500"
             onClick={(e) => {
               e.stopPropagation();
-              setIsEmojiPickerOpen(true);
+              setIsEmojiPickerOpen((isOpen) => !isOpen);
             }}
           >
             <RiEmojiStickerLine className="text-2xl" />
           </button>
-          <div className="absolute bottom-16 right-0" ref={emojiRef}>
-            <EmojiPicker
-              open={isEmojiPickerOpen}
-              onEmojiClick={handleAddEmoji}
-            />
-          </div>
+          {isEmojiPickerOpen && (
+            <div className="absolute bottom-16 right-0" ref={emojiRef}>
+              <EmojiPicker onEmojiClick={handleAddEmoji} />
+            </div>
+          )}
         </div>
       </div>
       <button
-        className="bg-[#8417ff] rounded-md flex items-center justify-center p-5 hover:bg-[#741bda] focus:border-none focus:outline-none focus:text-white transition-all duration-300"
+        className="bg-[#8417ff] rounded-md flex items-center justify-center p-5"
         onClick={handleSendMessage}
       >
         <IoSend className="text-2xl" />
