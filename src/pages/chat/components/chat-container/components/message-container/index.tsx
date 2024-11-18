@@ -1,14 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useChatStore } from "../../../../../../store/chat-slice";
 import { useUserInfoStore } from "../../../../../../store";
 import moment from "moment";
+import { apiClient } from "../../../../../../lib/api-client";
+import { GET_ALL_MESSAGES_ROUTES } from "../../../../../../utlis/constant";
 
 const MessageContainer = () => {
   const scrollRef = useRef<any>();
-  const { selectedChatType, selectedChatData, selectedChatMessages } =
-    useChatStore();
+  const {
+    selectedChatType,
+    selectedChatData,
+    selectedChatMessages,
+    setSelectedChatMessages,
+  } = useChatStore();
   const { userInfo } = useUserInfoStore();
+  console.log(userInfo)
 
   useEffect(() => {
     if (scrollRef?.current) {
@@ -16,7 +23,33 @@ const MessageContainer = () => {
     }
   }, [selectedChatMessages]);
 
-  const renderDmMessages = (messages) => {
+  const getMessages = useCallback(async () => {
+    try {
+      const response = await apiClient.post(
+        GET_ALL_MESSAGES_ROUTES,
+        { id: selectedChatData?._id },
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response?.data?.messages) {
+        setSelectedChatMessages(response?.data?.messages);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [selectedChatData?._id, setSelectedChatMessages]);
+
+  useEffect(() => {
+    if (selectedChatData?._id) {
+      if (selectedChatType === "contact") {
+        getMessages();
+      }
+    }
+  }, [selectedChatData, selectedChatType, getMessages]);
+
+  const renderDmMessages = (messages: any) => {
     console.log({ sender: messages.sender });
     return (
       <div
