@@ -5,11 +5,9 @@ interface IUser {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
   image: string;
-  profileSetup: boolean;
+  profileSetup?: boolean;
   color: number;
-  __v: number;
 }
 
 interface IMessage {
@@ -20,13 +18,28 @@ interface IMessage {
   timestamp: Date;
 }
 
+export interface IDirectMessageContacts {
+  color: number;
+  email: string;
+  firstName: string;
+  lastMessageTime: string;
+  lastName: string;
+  _id: string;
+  image: string;
+  profileSetup?: boolean;
+}
+
 interface ChatSliceState {
   selectedChatType: string | undefined;
   selectedChatData: IUser | undefined;
   selectedChatMessages: IMessage[];
+  directMessageContacts: IDirectMessageContacts[];
   setSelectedChatType: (selectedChatType: string) => void;
   setSelectedChatData: (selectedChatData: IUser | undefined) => void;
   setSelectedChatMessages: (selectedChatMessages: IMessage[]) => void;
+  setDirectMessageContact: (
+    directMessageContacts: IDirectMessageContacts[]
+  ) => void;
   closeChat: () => void;
   addMessages: (message: IMessage) => void;
 }
@@ -35,10 +48,13 @@ export const useChatStore = create<ChatSliceState>((set, get) => ({
   selectedChatType: undefined,
   selectedChatData: undefined,
   selectedChatMessages: [],
+  directMessageContacts: [],
   setSelectedChatType: (selectedChatType) => set({ selectedChatType }),
   setSelectedChatData: (selectedChatData) => set({ selectedChatData }),
   setSelectedChatMessages: (selectedChatMessages) =>
     set({ selectedChatMessages }),
+  setDirectMessageContact: (directMessageContacts) =>
+    set({ directMessageContacts }),
   closeChat: () =>
     set({
       selectedChatData: undefined,

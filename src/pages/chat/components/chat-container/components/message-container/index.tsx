@@ -15,7 +15,7 @@ const MessageContainer = () => {
     setSelectedChatMessages,
   } = useChatStore();
   const { userInfo } = useUserInfoStore();
-  console.log(userInfo)
+  console.log(userInfo);
 
   useEffect(() => {
     if (scrollRef?.current) {
@@ -54,7 +54,8 @@ const MessageContainer = () => {
     return (
       <div
         className={`${
-          messages.sender._id === selectedChatData?._id
+          messages.sender._id === selectedChatData?._id ||
+          messages.sender === selectedChatData?._id
             ? "text-left"
             : "text-right"
         } `}
@@ -62,7 +63,8 @@ const MessageContainer = () => {
         {messages.messageType === "text" && (
           <div
             className={`${
-              messages.sender._id !== selectedChatData?._id
+              messages.sender._id !== selectedChatData?._id &&
+              messages.sender !== selectedChatData?._id
                 ? "bg-[#8417ff]/5 text-[#8417ff]/90 border-[#8417ff]/50"
                 : "bg-[#2a2b33]/5 text-[#fff]/80 border-[#fff]/20"
             } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
