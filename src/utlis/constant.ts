@@ -15,3 +15,4 @@ export const GET_DM_CONTACT_ROUTES = `${CONTACT_ROUTES}/get-contact-for-dm`;
 
 export const MESSAGES_ROUTES = "api/messages";
 export const GET_ALL_MESSAGES_ROUTES = `${MESSAGES_ROUTES}/get-messages`;
+export const UPLOAD_FILE_ROUTE = `${MESSAGES_ROUTES}/upload-files`

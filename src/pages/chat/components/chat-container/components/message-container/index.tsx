@@ -5,6 +5,9 @@ import { useUserInfoStore } from "../../../../../../store";
 import moment from "moment";
 import { apiClient } from "../../../../../../lib/api-client";
 import { GET_ALL_MESSAGES_ROUTES } from "../../../../../../utlis/constant";
+import { ImageIcon } from "lucide-react";
+
+// const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg|tiff|ico)$/i;
 
 const MessageContainer = () => {
   const scrollRef = useRef<any>();
@@ -53,11 +56,11 @@ const MessageContainer = () => {
     console.log({ sender: messages.sender });
     return (
       <div
-        className={`${
+        className={`flex flex-col gap-1  ${
           messages.sender._id === selectedChatData?._id ||
           messages.sender === selectedChatData?._id
-            ? "text-left"
-            : "text-right"
+            ? "items-start"
+            : "items-end"
         } `}
       >
         {messages.messageType === "text" && (
@@ -70,6 +73,28 @@ const MessageContainer = () => {
             } border inline-block p-4 rounded my-1 max-w-[50%] break-words`}
           >
             {messages?.content}
+          </div>
+        )}
+        {messages.messageType === "file" && (
+          <div
+            className={`${
+              messages.sender._id !== selectedChatData?._id &&
+              messages.sender !== selectedChatData?._id
+                ? "bg-[#8417ff]/70  border-[#8417ff]/50"
+                : "bg-[#2a2b33]/70  border-[#fff]/20"
+            } h-[120px] w-[120px] rounded-lg p-2`}
+          >
+            {/* {imageRegex.test(messages?.fileUrl) ? (
+              <img
+                src={messages?.fileUrl}
+                alt="image"
+                height={"40px"}
+                width={"40px"}
+              />
+            ) : (
+              <></>
+            )} */}
+            <ImageIcon className="h-full w-full" />
           </div>
         )}
         <div className="text-xs text-green-600">

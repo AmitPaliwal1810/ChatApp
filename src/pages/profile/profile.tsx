@@ -100,7 +100,10 @@ export const Profile = () => {
           );
 
           if (response.status === 200 && response.data.image) {
-            setUserInfo((prev) => ({ ...prev, image: response?.data?.image }));
+            setUserInfo((prev) => ({
+              ...prev,
+              image: response?.data?.image,
+            }));
             toast.success("Image Uploaded Successfully");
           }
           const reader = new FileReader();
@@ -112,7 +115,7 @@ export const Profile = () => {
           reader.readAsDataURL(file);
         }
       } catch (error) {
-        console.error("Image upload failed", error);
+        console.error("Image upluad failed", error);
         toast.error("Failed to upload the image. Please try again.");
       }
     },
