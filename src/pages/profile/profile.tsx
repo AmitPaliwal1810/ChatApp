@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useUserInfoStore } from "../../store";
+import { UserInfo, useUserInfoStore } from "../../store";
 import { IoArrowBack } from "react-icons/io5";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import { colors, getColor } from "../../lib/utils";
@@ -94,32 +94,32 @@ export const Profile = () => {
           const response = await apiClient.post(
             ADD_PROFILE_IMAGE_ROUTE,
             formData,
-            {
-              withCredentials: true,
-            }
+            { withCredentials: true }
           );
 
           if (response.status === 200 && response.data.image) {
-            setUserInfo((prev) => ({
-              ...prev,
-              image: response?.data?.image,
-            }));
+            useUserInfoStore.getState().setUserInfo({
+              ...useUserInfoStore.getState().userInfo,
+              image: response.data.image,
+            } as UserInfo);
+
             toast.success("Image Uploaded Successfully");
           }
+
           const reader = new FileReader();
           reader.onload = () => {
             if (reader?.result) {
-              setImage(reader.result);
+              setImage(reader.result as string);
             }
           };
           reader.readAsDataURL(file);
         }
       } catch (error) {
-        console.error("Image upluad failed", error);
+        console.error("Image upload failed", error);
         toast.error("Failed to upload the image. Please try again.");
       }
     },
-    [setUserInfo]
+    []
   );
 
   const deleteImage = useCallback(async () => {
@@ -128,7 +128,7 @@ export const Profile = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setUserInfo({ ...userInfo, image: null });
+        setUserInfo({ ...userInfo, image: null } as UserInfo);
         toast.success("Image Removed Successfully");
         setImage(null);
       }

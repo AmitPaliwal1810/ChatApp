@@ -4,10 +4,15 @@ import { useChatStore } from "../../../../../../store/chat-slice";
 import { useUserInfoStore } from "../../../../../../store";
 import moment from "moment";
 import { apiClient } from "../../../../../../lib/api-client";
-import { GET_ALL_MESSAGES_ROUTES } from "../../../../../../utlis/constant";
-import { ImageIcon } from "lucide-react";
+import {
+  GET_ALL_MESSAGES_ROUTES,
+  HOST,
+} from "../../../../../../utlis/constant";
+import { Download, Folder } from "lucide-react";
+import { toast } from "sonner";
+// import { ImageIcon } from "lucide-react";
 
-// const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg|tiff|ico)$/i;
+const imageRegex = /\.(jpg|jpeg|png|gif|bmp|webp|svg|tiff|ico)$/i;
 
 const MessageContainer = () => {
   const scrollRef = useRef<any>();
@@ -52,6 +57,36 @@ const MessageContainer = () => {
     }
   }, [selectedChatData, selectedChatType, getMessages]);
 
+  const handleDownloadFile = useCallback(
+    async (fileUrl: string, fileName: string) => {
+      try {
+        const response = await apiClient.get(`${HOST}/${fileUrl}`, {
+          responseType: "blob",
+        });
+
+        if (response.status === 200) {
+          const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+
+          const link = document.createElement("a");
+          link.href = urlBlob;
+          link.download = fileName;
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          window.URL.revokeObjectURL(urlBlob);
+        } else {
+          throw new Error("Failed to fetch the file.");
+        }
+      } catch (error) {
+        console.error("Error downloading file:", error);
+        toast.error("Failed to download the file. Please try again.");
+      }
+    },
+    []
+  );
+
   const renderDmMessages = (messages: any) => {
     console.log({ sender: messages.sender });
     return (
@@ -82,19 +117,40 @@ const MessageContainer = () => {
               messages.sender !== selectedChatData?._id
                 ? "bg-[#8417ff]/70  border-[#8417ff]/50"
                 : "bg-[#2a2b33]/70  border-[#fff]/20"
-            } h-[120px] w-[120px] rounded-lg p-2`}
+            }  rounded-lg p-2`}
           >
-            {/* {imageRegex.test(messages?.fileUrl) ? (
-              <img
-                src={messages?.fileUrl}
-                alt="image"
-                height={"40px"}
-                width={"40px"}
-              />
+            {imageRegex.test(messages?.fileUrl) ? (
+              <div className="cursor-pointer rounded-lg overflow-hidden ">
+                <img
+                  src={`${HOST}/${messages?.fileUrl}`}
+                  alt="image"
+                  height={300}
+                  width={300}
+                />
+              </div>
             ) : (
-              <></>
-            )} */}
-            <ImageIcon className="h-full w-full" />
+              <div className="h-full w-full flex justify-center items-center gap-4">
+                <span
+                  className="bg-black/20 p-3 rounded-full hover:bg-black/50 cursor-pointer transition-all duration-300 "
+                  onClick={() =>
+                    handleDownloadFile(
+                      messages?.fileUrl,
+                      messages?.fileUrl?.split("/")?.pop()
+                    )
+                  }
+                >
+                  <Download className="h-4 w-4" />
+                </span>
+                <div className="flex pl-10 items-center gap-5">
+                  <span className="text-white/80 text-3xl bg-black/20 rounded-full p-6">
+                    <Folder />
+                  </span>
+                  <span className="text-xs">
+                    {messages?.fileUrl?.split("/")?.pop()}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
         <div className="text-xs text-green-600">
