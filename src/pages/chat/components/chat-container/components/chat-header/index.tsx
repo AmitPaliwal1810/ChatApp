@@ -13,27 +13,37 @@ const ChatHeader = () => {
         <div className="flex gap-3 items-center justify-center ">
           <div className="flex gap-3 items-center justify-center">
             <div className="w-12 h-12 relative ">
-              <Avatar className="relative h-12 w-12 rounded-full overflow-hidden">
-                {selectedChatData?.image ? (
-                  <AvatarImage
-                    src={`${HOST}/${selectedChatData?.image}`}
-                    alt="profile"
-                    className="object-cover h-full bg-black rounded-full"
-                  />
-                ) : (
-                  <div
-                    className={`uppercase h-12 w-12 text-lg  flex justify-center items-center border-[1px] rounded-full ${getColor(
-                      selectedChatData?.color || 0
-                    )} `}
-                  >
-                    {selectedChatData?.firstName
-                      ? selectedChatData?.firstName.split("").shift()
-                      : selectedChatData?.email?.split("").shift()}
-                  </div>
-                )}
-              </Avatar>
+              {selectedChatType === "contact" ? (
+                <Avatar className="relative h-12 w-12 rounded-full overflow-hidden">
+                  {selectedChatData?.image ? (
+                    <AvatarImage
+                      src={`${HOST}/${selectedChatData?.image}`}
+                      alt="profile"
+                      className="object-cover h-full bg-black rounded-full"
+                    />
+                  ) : (
+                    <div
+                      className={`uppercase h-12 w-12 text-lg  flex justify-center items-center border-[1px] rounded-full ${getColor(
+                        selectedChatData?.color || 0
+                      )} `}
+                    >
+                      {selectedChatData?.firstName
+                        ? selectedChatData?.firstName.split("").shift()
+                        : selectedChatData?.email?.split("").shift()}
+                    </div>
+                  )}
+                </Avatar>
+              ) : (
+                <div
+                  className={`uppercase h-10 w-10 text-lg  flex justify-center items-center border-[1px] rounded-full bg-[#ffffff22]} `}
+                >
+                  #
+                </div>
+              )}
             </div>
-            {selectedChatType === "contact" && (
+            {selectedChatType === "channel" ? (
+              <div>{selectedChatData?.name}</div>
+            ) : (
               <div>
                 {selectedChatData?.firstName || selectedChatData?.lastName
                   ? `${selectedChatData?.firstName} ${selectedChatData?.lastName}`

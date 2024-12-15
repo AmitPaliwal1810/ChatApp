@@ -5,7 +5,8 @@ import { HOST } from "../utlis/constant";
 import { getColor } from "../lib/utils";
 
 interface IProps {
-  contacts: IDirectMessageContacts[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  contacts: IDirectMessageContacts[] | any[];
   isChannel?: boolean;
 }
 
@@ -14,12 +15,18 @@ const ContactList = ({ contacts, isChannel = false }: IProps) => {
     selectedChatData,
     setSelectedChatData,
     setSelectedChatType,
-    selectedChatType,
+    // selectedChatType,
     setSelectedChatMessages,
   } = useChatStore();
 
   const handleClick = useCallback(
-    (contact: IDirectMessageContacts) => {
+    ({
+      contact,
+      isChannel,
+    }: {
+      contact: IDirectMessageContacts;
+      isChannel: boolean;
+    }) => {
       if (isChannel) setSelectedChatType("channel");
       else setSelectedChatType("contact");
       setSelectedChatData(contact);
@@ -28,7 +35,6 @@ const ContactList = ({ contacts, isChannel = false }: IProps) => {
       }
     },
     [
-      isChannel,
       selectedChatData,
       setSelectedChatData,
       setSelectedChatMessages,
@@ -46,10 +52,10 @@ const ContactList = ({ contacts, isChannel = false }: IProps) => {
               ? "bg-[#8417ff] hover:bg-[#8417ff]"
               : "hover:bg-[#f1f1f111] "
           }`}
-          onClick={() => handleClick(contact)}
+          onClick={() => handleClick({ contact, isChannel: isChannel })}
         >
           <div className="flex gap-5 items-center justify-start text-neutral-300">
-            {!isChannel && (
+            {
               <Avatar className="relative h-10 w-10 rounded-full overflow-hidden">
                 {contact?.image ? (
                   <AvatarImage
@@ -59,18 +65,28 @@ const ContactList = ({ contacts, isChannel = false }: IProps) => {
                   />
                 ) : (
                   <div
-                    className={`uppercase h-10 w-10 text-lg  flex justify-center items-center border-[1px] rounded-full ${getColor(
-                      contact?.color || 0
-                    )} `}
+                    className={`uppercase h-10 w-10 text-lg  flex justify-center items-center border-[1px] rounded-full ${
+                      isChannel
+                        ? "bg-[#ffffff22]"
+                        : getColor(contact?.color || 0)
+                    } `}
                   >
-                    {contact?.firstName
-                      ? contact?.firstName.split("").shift()
-                      : contact?.email?.split("").shift()}
+                    {isChannel ? (
+                      <>#</>
+                    ) : (
+                      <>
+                        {contact?.firstName
+                          ? contact?.firstName.split("").shift()
+                          : contact?.email?.split("").shift()}
+                      </>
+                    )}
                   </div>
                 )}
               </Avatar>
-            )}
-            {!isChannel && (
+            }
+            {isChannel ? (
+              <div>{contact?.name}</div>
+            ) : (
               <div>
                 {contact?.firstName || contact?.lastName
                   ? `${contact?.firstName} ${contact?.lastName}`

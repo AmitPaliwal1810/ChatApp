@@ -13,6 +13,7 @@ import { HOST } from "../utlis/constant";
 
 const SocketContext = createContext<Socket | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSocket = () => {
   return useContext(SocketContext);
 };
@@ -53,7 +54,20 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
         }
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleReceiveChannelMessage = (message: any) => {
+        const { selectedChatData, selectedChatType, addMessages } =
+          useChatStore.getState();
+        if (
+          selectedChatType !== undefined &&
+          selectedChatData?._id === message?.channelId
+        ) {
+          addMessages(message);
+        }
+      };
+
       socket.current.on("receiveMessage", handleReceiveMessage);
+      socket.current.on("receive-channel-message", handleReceiveChannelMessage);
 
       return () => {
         // socket.current?.off("receiveMessage", handleReceiveMessage);

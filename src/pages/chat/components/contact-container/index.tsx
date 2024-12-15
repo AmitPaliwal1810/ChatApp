@@ -2,15 +2,25 @@ import { useCallback, useEffect } from "react";
 import NewDm from "./components/new-dm";
 import ProfileInfo from "./components/profile-info";
 import { apiClient } from "../../../../lib/api-client";
-import { GET_DM_CONTACT_ROUTES } from "../../../../utlis/constant";
 import {
+  GET_ALL_CHANNELS_ROUTES,
+  GET_DM_CONTACT_ROUTES,
+} from "../../../../utlis/constant";
+import {
+  
   IDirectMessageContacts,
   useChatStore,
 } from "../../../../store/chat-slice";
 import ContactList from "../../../../components/contact-list";
+import CreateChannel from "./components/create-channel";
 
 const ContactContainer = () => {
-  const { setDirectMessageContact, directMessageContacts } = useChatStore();
+  const {
+    setDirectMessageContact,
+    directMessageContacts,
+    channels,
+    setChannels,
+  } = useChatStore();
 
   const getContact = useCallback(async () => {
     try {
@@ -18,7 +28,6 @@ const ContactContainer = () => {
         withCredentials: true,
       });
       if (response.data.contacts) {
-        console.log({ data: response.data.contacts });
         setDirectMessageContact(
           response.data.contacts as IDirectMessageContacts[]
         );
@@ -28,9 +37,23 @@ const ContactContainer = () => {
     }
   }, [setDirectMessageContact]);
 
+  const getChannels = useCallback(async () => {
+    try {
+      const response = await apiClient.get(GET_ALL_CHANNELS_ROUTES, {
+        withCredentials: true,
+      });
+      if (response?.data?.channels) {
+        setChannels(response?.data?.channels as IDirectMessageContacts[]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [setChannels]);
+
   useEffect(() => {
     getContact();
-  }, [getContact]);
+    getChannels();
+  }, [getChannels, getContact]);
 
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
@@ -47,6 +70,10 @@ const ContactContainer = () => {
       <div className="my-5">
         <div className="flex items-center justify-between pr-10">
           <Title text={"Channels"} />
+          <CreateChannel />
+        </div>
+        <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden">
+          <ContactList contacts={channels} isChannel={true} />
         </div>
       </div>
       <ProfileInfo />

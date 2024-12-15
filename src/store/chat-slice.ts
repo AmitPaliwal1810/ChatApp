@@ -8,6 +8,9 @@ interface IUser {
   image: string;
   profileSetup?: boolean;
   color: number;
+  name?: string;
+  members?: string[];
+  admin?: string;
 }
 
 interface IMessage {
@@ -27,6 +30,9 @@ export interface IDirectMessageContacts {
   _id: string;
   image: string;
   profileSetup?: boolean;
+  name?: string;
+  members?: string[];
+  admin?: string;
 }
 
 interface ChatSliceState {
@@ -34,6 +40,9 @@ interface ChatSliceState {
   selectedChatData: IUser | undefined;
   selectedChatMessages: IMessage[];
   directMessageContacts: IDirectMessageContacts[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  channels: any[];
+  setChannels: (channels: IDirectMessageContacts[]) => void;
   setSelectedChatType: (selectedChatType: string) => void;
   setSelectedChatData: (selectedChatData: IUser | undefined) => void;
   setSelectedChatMessages: (selectedChatMessages: IMessage[]) => void;
@@ -42,13 +51,18 @@ interface ChatSliceState {
   ) => void;
   closeChat: () => void;
   addMessages: (message: IMessage) => void;
+  addChannels: (channel: IDirectMessageContacts[]) => void;
 }
+
+//-------------------------------- main function - store ------------------------------------------------------
 
 export const useChatStore = create<ChatSliceState>((set, get) => ({
   selectedChatType: undefined,
   selectedChatData: undefined,
   selectedChatMessages: [],
   directMessageContacts: [],
+  channels: [],
+  setChannels: (channels) => set({ channels }),
   setSelectedChatType: (selectedChatType) => set({ selectedChatType }),
   setSelectedChatData: (selectedChatData) => set({ selectedChatData }),
   setSelectedChatMessages: (selectedChatMessages) =>
@@ -66,5 +80,9 @@ export const useChatStore = create<ChatSliceState>((set, get) => ({
     set({
       selectedChatMessages: [...selectedChatMessages, message],
     });
+  },
+  addChannels: (channel) => {
+    const channels = get().channels;
+    set({ channels: [channel, ...channels] });
   },
 }));
