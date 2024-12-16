@@ -81,7 +81,7 @@ const MessageContainer = () => {
         getChannelMessages();
       }
     }
-  }, [selectedChatData, selectedChatType, getMessages]);
+  }, [selectedChatData, selectedChatType, getMessages, getChannelMessages]);
 
   const handleDownloadFile = useCallback(
     async (fileUrl: string, fileName: string) => {

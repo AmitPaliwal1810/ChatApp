@@ -7,12 +7,12 @@ import {
   GET_DM_CONTACT_ROUTES,
 } from "../../../../utlis/constant";
 import {
-  
   IDirectMessageContacts,
   useChatStore,
 } from "../../../../store/chat-slice";
 import ContactList from "../../../../components/contact-list";
 import CreateChannel from "./components/create-channel";
+import logo from "@/assets/images/logo.svg";
 
 const ContactContainer = () => {
   const {
@@ -57,7 +57,9 @@ const ContactContainer = () => {
 
   return (
     <div className="relative md:w-[35vw] lg:w-[30vw] xl:w-[20vw] bg-[#1b1c24] border-r-2 border-[#2f303b] w-full">
-      <div className="flex p-5 justify-center items-center gap-2"> LOGO </div>
+      <div className="flex p-5 justify-center items-center gap-2">
+        <img src={logo} alt="logo" />
+      </div>
       <div className="my-5">
         <div className="flex items-center justify-between pr-10">
           <Title text={"Direct Messages"} />
