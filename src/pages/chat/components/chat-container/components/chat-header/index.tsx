@@ -8,7 +8,7 @@ const ChatHeader = () => {
   const { closeChat, selectedChatData, selectedChatType } = useChatStore();
 
   return (
-    <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-10">
+    <div className="h-[10vh] w-full border-b-2 border-[#2f303b] flex items-center justify-between px-10">
       <div className="w-full flex gap-5 items-center justify-between">
         <div className="flex gap-3 items-center justify-center ">
           <div className="flex gap-3 items-center justify-center">
